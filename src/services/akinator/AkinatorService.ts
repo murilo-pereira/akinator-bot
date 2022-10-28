@@ -35,6 +35,8 @@ export class AkinatorService {
 
             await this.client.sendImage(message.from, this.processAnswers(aki.answers))
 
+            AkinatorRepository.deleteSession(message.from)
+
             return
         }
 

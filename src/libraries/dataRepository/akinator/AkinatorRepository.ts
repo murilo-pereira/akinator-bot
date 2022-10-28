@@ -3,7 +3,7 @@ import { Aki } from 'aki-api'
 export class AkinatorRepository {
     private static sessions: AkinatorSession = {}
 
-    static setSession(key: string, akiInstance: Aki){
+    static setSession(key: string, akiInstance: Aki): void {
         AkinatorRepository.sessions[key] = akiInstance
     }
 
@@ -13,6 +13,10 @@ export class AkinatorRepository {
         }
 
         return undefined
+    }
+
+    static deleteSession(key: string): void {
+        delete AkinatorRepository.sessions[key]
     }
 }
 
