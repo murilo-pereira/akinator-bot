@@ -18,7 +18,7 @@ export class AkinatorService {
         AkinatorRepository.setSession(message.from, aki)
 
         await this.client.sendText(message.from, aki.question ?? '')
-        await this.client.sendText(message.from, this.processAnswers(aki.answers))
+        await this.client.sendText(message.from, this.processAnswersOptions(aki.answers))
     }
 
     public async processResponses(message: Message): Promise<void> {
@@ -33,7 +33,18 @@ export class AkinatorService {
         if (aki.progress >= 70 || aki.currentStep >= 78) {
             await aki.win()
 
-            await this.client.sendImage(message.from, this.processAnswers(aki.answers))
+            const guess = this.processAnswersGuess(aki.answers)
+
+            if(guess){
+                await this.client.sendImage(message.from, guess.absolute_picture_path, '', guess.name)
+
+                AkinatorRepository.deleteSession(message.from)
+
+                return
+            }
+
+            await this.client.sendText(message.from, 'Algo deu errado')
+            await this.client.sendText(message.from, 'Envie start para começar')
 
             AkinatorRepository.deleteSession(message.from)
 
@@ -51,7 +62,7 @@ export class AkinatorService {
         await aki.step(value)
 
         await this.client.sendText(message.from, aki.question ?? '')
-        await this.client.sendText(message.from, this.processAnswers(aki.answers))
+        await this.client.sendText(message.from, this.processAnswersOptions(aki.answers))
     }
 
     private parseResponse(body: string): 0 | 1 | 2 | 3 | 4 | null {
@@ -73,21 +84,25 @@ export class AkinatorService {
         }
     }
 
-    private processAnswers(values: string[] | guess[]): string {
-        if(typeof values[0] === 'string'){
-            let modifiedValue = ''
-
-            for (const [index, value] of values.entries()) {
-                modifiedValue += `${index + 1} - ${value}\n`
-            }
-
-            return modifiedValue
-        }
-
-        if(!values[0]){
+    private processAnswersOptions(values: string[] | guess[]): string {
+        if(typeof values[0] !== 'string'){
             return ''
         }
 
-        return values[0].absolute_picture_path
+        let modifiedValue = ''
+
+        for (const [index, value] of values.entries()) {
+            modifiedValue += `${index + 1} - ${value}\n`
+        }
+
+        return modifiedValue
+    }
+
+    private processAnswersGuess(values: string[] | guess[]): guess | undefined {
+        if(typeof values[0] === 'string'){
+            return undefined
+        }
+
+        return values[0]
     }
 }

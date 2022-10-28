@@ -1,4 +1,5 @@
 import { config } from "dotenv"
+import { Whatsapp } from "venom-bot"
 import { createExpressServer } from 'routing-controllers'
 import { Configurations } from "./libraries/utils/Configurations"
 import { RoutesController } from "./http/controllers/RoutesController"
@@ -20,7 +21,11 @@ app.listen(Configurations.getServerPort(), () => console.log(`server running on 
 function createClient() {
     const clientService = new ClientService()
 
-    clientService.create().then().catch((err) => {
+    clientService.create().then(async (client: Whatsapp) => {
+        if(Configurations.getWhatsappProfileName().length > 0){
+            await client.setProfileName(Configurations.getWhatsappProfileName())
+        }
+    }).catch((err) => {
         console.log(err)
 
         throw err

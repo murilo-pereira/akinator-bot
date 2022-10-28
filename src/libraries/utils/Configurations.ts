@@ -3,6 +3,10 @@ export namespace Configurations {
         return process.env.SERVER_PORT!
     }
 
+    export function getWhatsappProfileName(): string {
+        return process.env.WHATSAPP_PROFILE_NAME!
+    }
+
     export function getVenomSessionName(): string {
         return process.env.VENOM_SESSION_NAME!
     }
